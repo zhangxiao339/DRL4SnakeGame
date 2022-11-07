@@ -7,6 +7,7 @@ import numpy.random as rd
 from copy import deepcopy
 from core import *
 
+
 class AgentPPO:
     def __init__(self):
         super().__init__()
@@ -136,6 +137,7 @@ class AgentPPO:
         for tar, cur in zip(target_net.parameters(), current_net.parameters()):
             tar.data.copy_(cur.data.__mul__(tau) + tar.data.__mul__(1 - tau))
 
+
 class AgentDiscretePPO(AgentPPO):
     def init(self, net_dim, state_dim, action_dim, learning_rate=1e-4, if_use_gae=False):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -155,11 +157,10 @@ class AgentDiscretePPO(AgentPPO):
         state = self.state
         for _ in range(target_step):
             a_int, a_prob = self.select_action(state)
-            next_state, reward, done,_ = env.step(int(a_int))
+            next_state, reward, done, _ = env.step(int(a_int))
             other = (reward * reward_scale, 0.0 if done else gamma, a_int, *a_prob)
             trajectory_list.append((state, other))
 
             state = env.reset() if done else next_state
         self.state = state
         return trajectory_list
-
